@@ -20,9 +20,10 @@ def main():
             r3 = requests.get(urlocean)
 
             r2check = r2.json()
+            r3check = r3.json()
 
             def answer():
-                if list(r2check.keys())[0] == 'codes':
+                if "codes" in r2check:
                     Country = r2.json()["countryName"]
                     Area =  r2.json()["adminName1"]
                     if Country in Area:
@@ -32,8 +33,9 @@ def main():
                         print(Area + ", " + Country)
                         return Area + ", " + Country
                 else:
-                    print(r3.json()["ocean"]["name"])
-                    return r3.json()["ocean"]["name"]
+                    Ocean = r3check["ocean"]["name"]
+                    print(Ocean)
+                    return Ocean
 
             answer()
             time.sleep(15.0)
