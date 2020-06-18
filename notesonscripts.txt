@@ -1,0 +1,78 @@
+A simple program that calls an api to get the lat and long of the International Space Station and then uses that to make a request to https://www.geonames.org/ to determin the ocean or location it is above
+
+iss-to-lcd.py sends the output to a 16x2 screen. The details for setting up the hardware can be found here: https://pimylifeup.com/raspberry-pi-lcd-16x2/
+
+A general gist of what it needs to do in steps and how to check things:
+
+#Make the request for the lat and long of the IIS:
+>>> r1 = requests.get("http://api.open-notify.org/iss-now.json")
+
+INFO=====
+>>> r1.json()["iss_position"]
+{'longitude': '-72.6008', 'latitude': '43.8976'}
+INFO=====
+
+INFO=====
+Easily check requests content with:
+>>> print(r2.content)
+b'{"status":{"message":"we are afraid we could not find a administrative country subdivision for latitude and longitude :49.6922,-61.4475","value":15}}'
+INFO=====
+
+#Make the responce json into a python dict#
+>>> isspos = r1.json()["iss_position"]
+
+INFO=====
+>>> print(isspos)
+{'latitude': '18.3313', 'longitude': '-152.0061'}
+>>> type(isspos)
+<class 'dict'>
+>>> print(isspos["latitude"])
+18.3313
+>>> print(isspos["longitude"])
+-152.0061
+INFO====
+
+#Build the geonames URL#
+>>> geouser = '<username of user>'
+>>> geonames_url = 'http://api.geonames.org/'
+>>> urlcountry = geonames_url + 'countrySubdivisionJSON?lat=' + isspos["latitude"] + '&lng=' + isspos["longitude"] + '&username=' + geouser
+>>> urlocean = geonames_url + 'oceanJSON?lat=' + isspos["latitude"] + '&lng=' + isspos["longitude"] + '&username=' + geouser
+
+INFO=====
+r1 = requests.get("http://api.geonames.org/countrySubdivisionJSON?lat=51.0021&lng=-122.6492&username=jheath11011") 
+INFO=====
+
+#Call the geonames api#
+>>> r2 = requests.get(urlcountry)
+>>> r3 = requests.get(urlocean)
+
+If statement required to ignore if no country found
+
+>>> list(rcheck.keys())[0]
+'ocean' <--- if worked for ocean
+>>> rcheck = r2.json()
+>>> list(rcheck.keys())[0]
+'status' <---- if an error
+
+
+>>> Country = r2.json()["countryName"]
+>>> Area =  r2.json()["adminName1"]
+>>> Ocean = r3.json()["ocean"]
+
+#Print the results#
+>>> print(Area + ", " + Country)
+>>> print(ocean)
+
+
+INFO=====
+>>> print(ocean)
+{'distance': '0', 'name': 'Gulf Of St Lawrence'}
+INFO=====
+
+>>> print(ocean["name"])
+Gulf Of St Lawrence
+
+
+>>> print(Area + ", " + Country)
+British Columbia, Canada
+
